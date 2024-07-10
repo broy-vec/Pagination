@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagination</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        ul{
+            display: flex;
+            list-style: none;
+            /* gap: 10px; */
+            justify-content: space-evenly;
+        }
+        ul li{
+            cursor: pointer;
+        }
+        ul li:hover{
+            background-color: black;
+            color: antiquewhite;
+            font-size: 25px;
+            border-radius: 50%;
+        }
+        table{
+            width: 100%;
+        }
+        table,th,td{
+            border: 3px solid red;
+            border-collapse: collapse;
+        }
+        table thead{
+            background-color: aqua;
+        }
+    </style>
+</head>
+<body>
+    <h2>Pagination</h2>
+    <table id="main">
+      <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <ul id="pag"></ul>
+
+    <script>
+        let todos = []
+        let cp = 1
+        let rec = 10 //total records per page should be 10
+
+        axios.get("https://jsonplaceholder.typicode.com/todos").then((res)=>{
+            todos = res.data
+            renderPagination()
+            renderPage(cp)
+        })
+        .catch((err)=>{
+            console.log(err)
+        })
+
+        function renderPage(cp){
+            let start = (cp-1)*rec
+            let end = cp*rec
+            let upd = todos.slice(start,end)
+
+            let con = document.querySelector("#main tbody")
+            con.innerHTML = ""//clear previous content
+
+            upd.forEach((item)=>{
+                let tab = document.createElement("tr")
+                tab.innerHTML = `
+                <td> ${item.id} </td> <td>${item.title}</td>
+                `
+            con.appendChild(tab)
+            })
+        }
+
+        function renderPagination(){
+            let totalPages = Math.ceil(todos.length/rec)
+            let pag = document.getElementById("pag")
+            pag.innerHTML=""
+            for(let i = 1;i<=totalPages;i++){
+                let li = document.createElement("li")
+                li.innerText = i
+                li.addEventListener("click",()=>{
+                    cp = i
+                    renderPage(cp)
+                })
+                pag.appendChild(li)
+            }
+
+        }
+
+
+    </script>
+</body>
+</html>
